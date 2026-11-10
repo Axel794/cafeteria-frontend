@@ -1,0 +1,46 @@
+<div class="mx-auto" style="max-width: 420px">
+  <h1 class="h3 mb-3">Acceso del personal</h1>
+
+  @if (expirada()) {
+    <div class="alert alert-warning" role="alert">Tu sesión expiró. Vuelve a iniciar sesión.</div>
+  }
+
+  <form [formGroup]="form" (ngSubmit)="entrar()" novalidate class="card card-body">
+    <div class="mb-3">
+      <label class="form-label" for="username">Usuario</label>
+      <input
+        id="username"
+        type="text"
+        class="form-control"
+        formControlName="username"
+        autocomplete="username"
+        [class.is-invalid]="form.controls.username.invalid && form.controls.username.touched"
+      />
+      <div class="invalid-feedback">Escribe tu usuario.</div>
+    </div>
+    <div class="mb-3">
+      <label class="form-label" for="password">Contraseña</label>
+      <input
+        id="password"
+        type="password"
+        class="form-control"
+        formControlName="password"
+        autocomplete="current-password"
+        [class.is-invalid]="form.controls.password.invalid && form.controls.password.touched"
+      />
+      <div class="invalid-feedback">Escribe tu contraseña.</div>
+    </div>
+
+    @if (error()) {
+      <div class="alert alert-danger" role="alert">{{ error() }}</div>
+    }
+
+    <button type="submit" class="btn btn-primary" [disabled]="enviando()">
+      @if (enviando()) {
+        Ingresando…
+      } @else {
+        Ingresar
+      }
+    </button>
+  </form>
+</div>

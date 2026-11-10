@@ -1,0 +1,161 @@
+/*
+ * Estilos globales. Bootstrap aporta la base (grid, botones, formularios, tablas);
+ * aqui solo se ajusta el color de la marca (tonos cafe) y algunos componentes propios.
+ */
+:root {
+  --cafe-oscuro: #3e2a1f;
+  --cafe: #6f4e37;
+  --cafe-claro: #f6efe7;
+  --bs-primary: var(--cafe);
+  --bs-primary-rgb: 111, 78, 55;
+  --bs-link-color: var(--cafe);
+  --bs-link-hover-color: var(--cafe-oscuro);
+  --bs-body-bg: #fbf8f4;
+  --bs-body-color: #2b211b;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1 0 auto;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--cafe);
+  --bs-btn-border-color: var(--cafe);
+  --bs-btn-hover-bg: var(--cafe-oscuro);
+  --bs-btn-hover-border-color: var(--cafe-oscuro);
+  --bs-btn-active-bg: var(--cafe-oscuro);
+  --bs-btn-active-border-color: var(--cafe-oscuro);
+  --bs-btn-disabled-bg: var(--cafe);
+  --bs-btn-disabled-border-color: var(--cafe);
+}
+
+.btn-outline-primary {
+  --bs-btn-color: var(--cafe);
+  --bs-btn-border-color: var(--cafe);
+  --bs-btn-hover-bg: var(--cafe);
+  --bs-btn-hover-border-color: var(--cafe);
+  --bs-btn-active-bg: var(--cafe-oscuro);
+  --bs-btn-active-border-color: var(--cafe-oscuro);
+}
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+  border-color: var(--cafe);
+  box-shadow: 0 0 0 0.25rem rgba(111, 78, 55, 0.25);
+}
+
+.form-check-input:checked {
+  background-color: var(--cafe);
+  border-color: var(--cafe);
+}
+
+.app-nav {
+  background-color: var(--cafe-oscuro);
+}
+
+.app-footer {
+  background-color: var(--cafe-claro);
+  color: #6b5a4d;
+  border-top: 1px solid #eadfd2;
+}
+
+/* ---- Carta ---- */
+.producto-card {
+  border: 1px solid #eadfd2;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  background: #fff;
+  height: 100%;
+}
+
+.producto-imagen {
+  height: 140px;
+  width: 100%;
+  object-fit: cover;
+}
+
+.producto-placeholder {
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #e8d8c6, #cdb095);
+  color: var(--cafe-oscuro);
+  font-size: 2.5rem;
+  font-weight: 600;
+}
+
+.filtro-categoria.active {
+  background-color: var(--cafe);
+  border-color: var(--cafe);
+  color: #fff;
+}
+
+/* ---- Seguimiento: pasos del pedido ---- */
+.pasos {
+  display: flex;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.paso {
+  flex: 1;
+  text-align: center;
+  font-size: 0.85rem;
+  color: #8a7a6d;
+}
+
+.paso::before {
+  content: '';
+  display: block;
+  height: 8px;
+  border-radius: 4px;
+  background: #e3d7ca;
+  margin-bottom: 0.4rem;
+}
+
+.paso.hecho::before {
+  background: #a9825f;
+}
+
+.paso.actual {
+  color: var(--cafe-oscuro);
+  font-weight: 600;
+}
+
+.paso.actual::before {
+  background: var(--cafe);
+}
+
+/* ---- Panel de comandas ---- */
+.comanda {
+  border: 1px solid #eadfd2;
+  border-left-width: 6px;
+  border-radius: 0.75rem;
+  background: #fff;
+}
+
+.comanda.estado-PENDIENTE {
+  border-left-color: #e0a800;
+}
+
+.comanda.estado-EN_PREPARACION {
+  border-left-color: #0d6efd;
+}
+
+.comanda.estado-LISTO {
+  border-left-color: #198754;
+}
+
+.comanda.estado-ENTREGADO {
+  border-left-color: #adb5bd;
+}

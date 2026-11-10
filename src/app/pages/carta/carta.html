@@ -1,0 +1,92 @@
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div>
+    <h1 class="h3 mb-0">Nuestra carta</h1>
+    <p class="text-secondary mb-0">Elige tus productos y arma tu pedido desde el celular.</p>
+  </div>
+  @if (!carrito.vacio()) {
+    <a class="btn btn-primary" routerLink="/carrito">
+      Ver mi pedido ({{ carrito.cantidadTotal() }}) · {{ moneda }} {{ carrito.total() | number: '1.2-2' }}
+    </a>
+  }
+</div>
+
+@if (agregado()) {
+  <div class="alert alert-success py-2" role="status">
+    «{{ agregado() }}» se agregó a tu pedido.
+  </div>
+}
+
+@if (error()) {
+  <div class="alert alert-danger d-flex justify-content-between align-items-center" role="alert">
+    <span>{{ error() }}</span>
+    <button type="button" class="btn btn-sm btn-outline-danger" (click)="cargar()">Reintentar</button>
+  </div>
+}
+
+@if (cargando()) {
+  <div class="text-center py-5" role="status">
+    <div class="spinner-border text-secondary"></div>
+    <p class="text-secondary mt-2">Cargando la carta…</p>
+  </div>
+} @else if (!error()) {
+  <div class="d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Filtrar por categoría">
+    <button
+      type="button"
+      class="btn btn-outline-secondary btn-sm filtro-categoria"
+      [class.active]="categoriaId() === null"
+      (click)="elegirCategoria(null)"
+    >
+      Todas
+    </button>
+    @for (categoria of categorias(); track categoria.id) {
+      <button
+        type="button"
+        class="btn btn-outline-secondary btn-sm filtro-categoria"
+        [class.active]="categoriaId() === categoria.id"
+        (click)="elegirCategoria(categoria.id)"
+      >
+        {{ categoria.nombre }}
+      </button>
+    }
+  </div>
+
+  @if (visibles().length === 0) {
+    <p class="text-secondary">No hay productos en esta categoría.</p>
+  }
+
+  <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+    @for (producto of visibles(); track producto.id) {
+      <div class="col">
+        <article class="producto-card d-flex flex-column" [class.opacity-75]="!producto.disponible">
+          @if (producto.imagenUrl) {
+            <img class="producto-imagen" [src]="producto.imagenUrl" [alt]="producto.nombre" />
+          } @else {
+            <div class="producto-placeholder" aria-hidden="true">{{ producto.nombre.charAt(0) }}</div>
+          }
+          <div class="p-3 d-flex flex-column flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start gap-2">
+              <h2 class="h6 mb-1">{{ producto.nombre }}</h2>
+              <span class="fw-semibold text-nowrap">{{ moneda }} {{ producto.precio | number: '1.2-2' }}</span>
+            </div>
+            <span class="badge text-bg-light align-self-start mb-2">{{ producto.categoria }}</span>
+            @if (producto.descripcion) {
+              <p class="small text-secondary mb-2">{{ producto.descripcion }}</p>
+            }
+            @if (producto.alergenos) {
+              <p class="small text-secondary mb-2">Alérgenos: {{ producto.alergenos }}</p>
+            }
+            <div class="mt-auto">
+              @if (producto.disponible) {
+                <button type="button" class="btn btn-primary btn-sm w-100" (click)="agregar(producto)">
+                  Agregar al pedido
+                </button>
+              } @else {
+                <button type="button" class="btn btn-secondary btn-sm w-100" disabled>Agotado</button>
+              }
+            </div>
+          </div>
+        </article>
+      </div>
+    }
+  </div>
+}

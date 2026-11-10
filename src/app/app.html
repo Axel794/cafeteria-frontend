@@ -1,0 +1,61 @@
+<nav class="navbar navbar-expand-lg navbar-dark app-nav sticky-top">
+  <div class="container">
+    <a class="navbar-brand fw-semibold" routerLink="/carta" (click)="cerrarMenu()">Como dice el dicho</a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      aria-label="Abrir o cerrar el menú"
+      [attr.aria-expanded]="menuAbierto()"
+      (click)="alternarMenu()"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" [class.show]="menuAbierto()">
+      <ul class="navbar-nav me-auto" (click)="cerrarMenu()">
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/carta" routerLinkActive="active">Carta</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/carrito" routerLinkActive="active">
+            Mi pedido
+            @if (carrito.cantidadTotal() > 0) {
+              <span class="badge rounded-pill text-bg-light ms-1">{{ carrito.cantidadTotal() }}</span>
+            }
+          </a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" routerLink="/seguimiento" routerLinkActive="active">Seguimiento</a>
+        </li>
+        @if (auth.esPersonal()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/panel" routerLinkActive="active">Panel de comandas</a>
+          </li>
+        }
+        @if (auth.esAdministrador()) {
+          <li class="nav-item">
+            <a class="nav-link" routerLink="/admin/productos" routerLinkActive="active">Administración</a>
+          </li>
+        }
+      </ul>
+
+      <div class="d-flex align-items-center gap-2 text-white">
+        @if (auth.esPersonal()) {
+          <span class="small">Hola, {{ auth.username() }}</span>
+          <button type="button" class="btn btn-outline-light btn-sm" (click)="salir()">Salir</button>
+        } @else {
+          <a class="btn btn-outline-light btn-sm" routerLink="/login" (click)="cerrarMenu()">Acceso del personal</a>
+        }
+      </div>
+    </div>
+  </div>
+</nav>
+
+<main class="container py-4">
+  <router-outlet />
+</main>
+
+<footer class="app-footer text-center small py-3">
+  Cafetería «Como dice el dicho» · Proyecto del Grupo 10 · Soluciones Web y Aplicaciones Distribuidas
+</footer>

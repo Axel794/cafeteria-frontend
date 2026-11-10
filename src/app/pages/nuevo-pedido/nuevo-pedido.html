@@ -1,0 +1,132 @@
+@if (confirmado(); as pedido) {
+  <div class="card border-success mx-auto" style="max-width: 560px">
+    <div class="card-body text-center">
+      <h1 class="h4 text-success">¡Pedido recibido!</h1>
+      <p class="mb-1">Tu número de ticket es</p>
+      <p class="display-6 fw-semibold mb-1" data-testid="ticket">{{ pedido.codigoTicket }}</p>
+      <p class="text-secondary">
+        Total: {{ moneda }} {{ pedido.total | number: '1.2-2' }} · Estado: {{ pedido.estado }}
+      </p>
+      <div class="d-flex flex-wrap justify-content-center gap-2">
+        <a class="btn btn-primary" [routerLink]="['/seguimiento', pedido.id]">Seguir mi pedido</a>
+        <a class="btn btn-outline-secondary" routerLink="/carta">Volver a la carta</a>
+      </div>
+    </div>
+  </div>
+} @else if (carrito.vacio()) {
+  <div class="text-center py-5">
+    <p class="text-secondary">Tu pedido está vacío.</p>
+    <a class="btn btn-primary" routerLink="/carta">Ver la carta</a>
+  </div>
+} @else {
+  <h1 class="h3 mb-3">Confirmar pedido</h1>
+
+  <div class="row g-4">
+    <div class="col-lg-7">
+      <form [formGroup]="form" (ngSubmit)="enviar()" novalidate class="card card-body">
+        <fieldset class="mb-3">
+          <legend class="h6">¿Cómo lo quieres?</legend>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" id="tipo-local" value="LOCAL" formControlName="tipoPedido" />
+            <label class="form-check-label" for="tipo-local">Para consumir en el local (mesa)</label>
+          </div>
+          <div class="form-check">
+            <input class="form-check-input" type="radio" id="tipo-pickup" value="PICKUP" formControlName="tipoPedido" />
+            <label class="form-check-label" for="tipo-pickup">Para llevar (pick-up)</label>
+          </div>
+        </fieldset>
+
+        @if (tipo() === 'LOCAL') {
+          <div class="mb-3">
+            <label class="form-label" for="mesa">Número de mesa</label>
+            <input
+              id="mesa"
+              type="number"
+              class="form-control"
+              formControlName="numeroMesa"
+              [class.is-invalid]="invalido(form.controls.numeroMesa)"
+              inputmode="numeric"
+            />
+            @if (invalido(form.controls.numeroMesa)) {
+              <div class="invalid-feedback">
+                @if (form.controls.numeroMesa.hasError('required')) {
+                  Indica el número de tu mesa.
+                } @else {
+                  La mesa debe estar entre 1 y 99.
+                }
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="mb-3">
+            <label class="form-label" for="nombre">Nombre de quien recoge</label>
+            <input
+              id="nombre"
+              type="text"
+              class="form-control"
+              formControlName="nombreCliente"
+              [class.is-invalid]="invalido(form.controls.nombreCliente)"
+              maxlength="100"
+            />
+            @if (invalido(form.controls.nombreCliente)) {
+              <div class="invalid-feedback">El nombre es obligatorio para pedidos para llevar.</div>
+            }
+          </div>
+          <div class="mb-3">
+            <label class="form-label" for="telefono">Teléfono de contacto</label>
+            <input
+              id="telefono"
+              type="tel"
+              class="form-control"
+              formControlName="telefonoCliente"
+              [class.is-invalid]="invalido(form.controls.telefonoCliente)"
+              maxlength="20"
+            />
+            @if (invalido(form.controls.telefonoCliente)) {
+              <div class="invalid-feedback">
+                @if (form.controls.telefonoCliente.hasError('required')) {
+                  El teléfono es obligatorio para pedidos para llevar.
+                } @else {
+                  Escribe un teléfono válido (solo números, de 7 a 20 caracteres).
+                }
+              </div>
+            }
+          </div>
+        }
+
+        @if (error()) {
+          <div class="alert alert-danger" role="alert">{{ error() }}</div>
+        }
+
+        <div class="d-flex justify-content-between">
+          <a class="btn btn-outline-secondary" routerLink="/carrito">Volver al carrito</a>
+          <button type="submit" class="btn btn-primary" [disabled]="enviando()">
+            @if (enviando()) {
+              Enviando…
+            } @else {
+              Confirmar pedido
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-lg-5">
+      <div class="card card-body">
+        <h2 class="h6">Resumen</h2>
+        <ul class="list-unstyled mb-2">
+          @for (linea of carrito.lineas(); track linea.producto.id) {
+            <li class="d-flex justify-content-between small py-1">
+              <span>{{ linea.cantidad }} × {{ linea.producto.nombre }}</span>
+              <span>{{ moneda }} {{ linea.producto.precio * linea.cantidad | number: '1.2-2' }}</span>
+            </li>
+          }
+        </ul>
+        <div class="d-flex justify-content-between fw-semibold border-top pt-2">
+          <span>Total estimado</span>
+          <span>{{ moneda }} {{ carrito.total() | number: '1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+}

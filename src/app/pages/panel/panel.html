@@ -1,0 +1,89 @@
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <h1 class="h3 mb-0">Panel de comandas</h1>
+  <button type="button" class="btn btn-outline-secondary btn-sm" (click)="recargar()">Actualizar</button>
+</div>
+
+<div class="d-flex flex-wrap gap-2 mb-3" role="group" aria-label="Filtrar por estado">
+  <button
+    type="button"
+    class="btn btn-sm btn-outline-secondary filtro-categoria"
+    [class.active]="filtro() === null"
+    (click)="filtrar(null)"
+  >
+    Todos
+  </button>
+  @for (e of estados; track e) {
+    <button
+      type="button"
+      class="btn btn-sm btn-outline-secondary filtro-categoria"
+      [class.active]="filtro() === e"
+      (click)="filtrar(e)"
+    >
+      {{ etiquetaEstado[e] }}
+    </button>
+  }
+</div>
+
+@if (error()) {
+  <div class="alert alert-danger" role="alert">{{ error() }}</div>
+}
+
+@if (cargando()) {
+  <div class="text-secondary" role="status">Cargando pedidos…</div>
+} @else if (pedidos().length === 0) {
+  <div class="text-secondary py-4 text-center">No hay pedidos en este estado.</div>
+} @else {
+  <div class="row g-3">
+    @for (p of pedidos(); track p.id) {
+      <div class="col-md-6 col-xl-4">
+        <div class="card h-100 comanda" [class]="'estado-' + p.estado">
+          <div class="card-body d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start">
+              <div>
+                <div class="h5 mb-0">{{ p.codigoTicket }}</div>
+                <div class="small text-secondary">{{ p.fechaHora | date: 'dd/MM HH:mm' }}</div>
+              </div>
+              <span class="badge text-bg-secondary">{{ etiquetaEstado[p.estado] }}</span>
+            </div>
+
+            <div class="small mt-2">
+              {{ etiquetaTipo[p.tipoPedido] }}
+              @if (p.tipoPedido === 'LOCAL') {
+                · Mesa {{ p.numeroMesa }}
+              } @else {
+                · {{ p.nombreCliente }} ({{ p.telefonoCliente }})
+              }
+            </div>
+
+            <ul class="list-unstyled my-3 flex-grow-1">
+              @for (d of p.detalles; track $index) {
+                <li class="py-1">
+                  <strong>{{ d.cantidad }} ×</strong> {{ d.producto }}
+                  @if (d.notas) {
+                    <div class="small fst-italic text-secondary">“{{ d.notas }}”</div>
+                  }
+                </li>
+              }
+            </ul>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="fw-semibold">{{ moneda }} {{ p.total | number: '1.2-2' }}</span>
+              @if (siguiente(p); as sig) {
+                <button
+                  type="button"
+                  class="btn btn-primary btn-sm"
+                  [disabled]="ocupados().has(p.id)"
+                  (click)="avanzar(p)"
+                >
+                  Pasar a «{{ etiquetaEstado[sig] }}»
+                </button>
+              } @else {
+                <span class="text-success small">Completado</span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+}

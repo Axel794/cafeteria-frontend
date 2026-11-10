@@ -1,0 +1,59 @@
+<h1 class="h3 mb-3">Seguimiento de tu pedido</h1>
+
+<form class="row g-2 align-items-start mb-4" (ngSubmit)="buscar()" novalidate>
+  <div class="col-sm-8 col-md-6">
+    <label class="visually-hidden" for="ticket">Número de ticket</label>
+    <input
+      id="ticket"
+      type="text"
+      class="form-control"
+      placeholder="Escribe tu ticket (ej. CDD-000012)"
+      [formControl]="campo"
+      [class.is-invalid]="mostrarError"
+    />
+    @if (mostrarError) {
+      <div class="invalid-feedback">Escribe el número de tu ticket, por ejemplo CDD-000012 o solo 12.</div>
+    }
+  </div>
+  <div class="col-auto">
+    <button type="submit" class="btn btn-primary" [disabled]="cargando()">Consultar</button>
+  </div>
+</form>
+
+@if (cargando()) {
+  <div class="text-secondary" role="status">Consultando…</div>
+}
+
+@if (error()) {
+  <div class="alert alert-danger" role="alert">{{ error() }}</div>
+}
+
+@if (tracker(); as t) {
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex flex-wrap justify-content-between gap-2 mb-3">
+        <div>
+          <div class="text-secondary small">Ticket</div>
+          <div class="h4 mb-0" data-testid="ticket">{{ t.codigoTicket }}</div>
+        </div>
+        <div class="text-md-end">
+          <div class="text-secondary small">{{ etiquetaTipo[t.tipoPedido] }}</div>
+          <div class="small">{{ t.fechaHora | date: 'dd/MM/yyyy HH:mm' }}</div>
+        </div>
+      </div>
+
+      <ol class="pasos mb-3" aria-label="Estado del pedido">
+        @for (paso of pasos; track paso; let i = $index) {
+          <li class="paso" [class.hecho]="i < indiceActual()" [class.actual]="i === indiceActual()">
+            {{ etiquetaEstado[paso] }}
+          </li>
+        }
+      </ol>
+
+      <div class="alert alert-info mb-0" role="status">{{ t.mensaje }}</div>
+      @if (t.estado !== 'ENTREGADO') {
+        <p class="small text-secondary mt-2 mb-0">Esta pantalla se actualiza sola cada 10 segundos.</p>
+      }
+    </div>
+  </div>
+}

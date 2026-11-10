@@ -1,0 +1,80 @@
+<h1 class="h3 mb-3">Mi pedido</h1>
+
+@if (carrito.vacio()) {
+  <div class="text-center py-5">
+    <p class="text-secondary">Todavía no agregaste productos.</p>
+    <a class="btn btn-primary" routerLink="/carta">Ver la carta</a>
+  </div>
+} @else {
+  <div class="table-responsive bg-white rounded border">
+    <table class="table align-middle mb-0">
+      <thead class="table-light">
+        <tr>
+          <th>Producto</th>
+          <th class="text-center">Cantidad</th>
+          <th class="text-end">Subtotal</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (linea of carrito.lineas(); track linea.producto.id) {
+          <tr>
+            <td>
+              <div class="fw-semibold">{{ linea.producto.nombre }}</div>
+              <div class="small text-secondary">{{ moneda }} {{ linea.producto.precio | number: '1.2-2' }} c/u</div>
+              <input
+                type="text"
+                class="form-control form-control-sm mt-2"
+                placeholder="Notas (ej. sin azúcar)"
+                maxlength="255"
+                [value]="linea.notas"
+                (input)="escribirNotas(linea, $event)"
+                [attr.aria-label]="'Notas para ' + linea.producto.nombre"
+              />
+            </td>
+            <td class="text-center text-nowrap">
+              <div class="btn-group btn-group-sm" role="group" [attr.aria-label]="'Cantidad de ' + linea.producto.nombre">
+                <button type="button" class="btn btn-outline-secondary" (click)="cambiarCantidad(linea, -1)">−</button>
+                <span class="btn btn-light disabled px-3">{{ linea.cantidad }}</span>
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  [disabled]="linea.cantidad >= maximo"
+                  (click)="cambiarCantidad(linea, 1)"
+                >
+                  +
+                </button>
+              </div>
+            </td>
+            <td class="text-end text-nowrap">
+              {{ moneda }} {{ linea.producto.precio * linea.cantidad | number: '1.2-2' }}
+            </td>
+            <td class="text-end">
+              <button type="button" class="btn btn-sm btn-outline-danger" (click)="carrito.quitar(linea.producto.id)">
+                Quitar
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="2" class="text-end">Total estimado</th>
+          <th class="text-end text-nowrap">{{ moneda }} {{ carrito.total() | number: '1.2-2' }}</th>
+          <th></th>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+  <p class="small text-secondary mt-2">
+    El total final lo calcula el sistema al confirmar el pedido. Máximo {{ maximo }} unidades por producto.
+  </p>
+
+  <div class="d-flex flex-wrap gap-2 justify-content-between mt-3">
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" routerLink="/carta">Seguir eligiendo</a>
+      <button type="button" class="btn btn-outline-danger" (click)="carrito.vaciar()">Vaciar</button>
+    </div>
+    <a class="btn btn-primary" routerLink="/pedido">Continuar con el pedido</a>
+  </div>
+}
