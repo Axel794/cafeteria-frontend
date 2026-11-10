@@ -8,7 +8,7 @@ import { Carta } from './pages/carta/carta';
 import { Login } from './pages/login/login';
 import { NuevoPedido } from './pages/nuevo-pedido/nuevo-pedido';
 import { Panel } from './pages/panel/panel';
-import { Seguimiento } from './pages/seguimiento/seguimiento';
+import Seguimiento from './pages/seguimiento/seguimiento';
 
 /**
  * Mapa de navegacion de la aplicacion.

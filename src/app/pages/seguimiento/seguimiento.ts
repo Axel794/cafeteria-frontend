@@ -18,7 +18,7 @@ const INTERVALO_MS = 10_000;
   imports: [ReactiveFormsModule, DatePipe],
   templateUrl: './seguimiento.html',
 })
-export class Seguimiento {
+class Seguimiento {
   /** Llega desde la ruta /seguimiento/:id gracias a withComponentInputBinding(). */
   readonly id = input<string>();
 
@@ -90,6 +90,10 @@ export class Seguimiento {
     this.pedidoService.tracker(id).subscribe({
       next: (respuesta) => {
         this.tracker.set(respuesta);
+        // El campo muestra el ticket (CDD-000007), aunque la ruta use el id (7).
+        if (!silencioso) {
+          this.campo.setValue(respuesta.codigoTicket, { emitEvent: false });
+        }
         this.error.set('');
         this.cargando.set(false);
         if (respuesta.estado !== 'ENTREGADO' && this.temporizador === undefined) {
@@ -114,3 +118,5 @@ export class Seguimiento {
     }
   }
 }
+
+export default Seguimiento;
