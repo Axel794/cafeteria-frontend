@@ -29,7 +29,7 @@ export class AdminCategorias {
   protected readonly confirmando = signal<number | null>(null);
 
   protected readonly form = this.fb.nonNullable.group({
-    nombre: ['', [Validators.required, Validators.maxLength(100), Validators.pattern(/.*\S.*/)]],
+    nombre: ['', [Validators.required, Validators.maxLength(80), Validators.pattern(/.*\S.*/)]],
   });
 
   constructor() {

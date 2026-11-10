@@ -60,6 +60,7 @@ createServer(async (req, res) => {
   if ((r = ruta.match(/^\/pedidos\/(\d+)\/tracker$/)) && m === 'GET') { const p = pedidos.find((x) => x.id === +r[1]); if (!p) return err(res, 404, 'Pedido no encontrado con id: ' + r[1]); return send(res, 200, { id: p.id, codigoTicket: p.codigoTicket, estado: p.estado, tipoPedido: p.tipoPedido, fechaHora: p.fechaHora, mensaje: msg(p) }); }
   if (ruta.startsWith('/pedidos')) {
     if (!rol) return err(res, 401, 'Se requiere autenticacion');
+    if ((r = ruta.match(/^\/pedidos\/(\d+)$/)) && m === 'GET') { const p = pedidos.find((x) => x.id === +r[1]); return p ? send(res, 200, p) : err(res, 404, 'Pedido no encontrado con id: ' + r[1]); }
     if (ruta === '/pedidos' && m === 'GET') { const e = url.searchParams.get('estado'); return send(res, 200, e ? pedidos.filter((p) => p.estado === e) : pedidos); }
     if ((r = ruta.match(/^\/pedidos\/(\d+)\/estado$/)) && m === 'PUT') { const p = pedidos.find((x) => x.id === +r[1]); if (!p) return err(res, 404, 'Pedido no encontrado'); if (ORDEN.indexOf(body.estado) !== ORDEN.indexOf(p.estado) + 1) return err(res, 422, 'Transicion de estado invalida: de ' + p.estado + ' a ' + body.estado); p.estado = body.estado; return send(res, 200, p); }
   }

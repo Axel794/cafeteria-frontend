@@ -20,6 +20,13 @@ body {
   flex-direction: column;
 }
 
+/* app-root envuelve nav + main + footer: debe llenar la altura para que el pie quede abajo */
+app-root {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
 main {
   flex: 1 0 auto;
 }

@@ -18,7 +18,7 @@ const INTERVALO_MS = 10_000;
   imports: [ReactiveFormsModule, DatePipe],
   templateUrl: './seguimiento.html',
 })
-class Seguimiento {
+export class Seguimiento {
   /** Llega desde la ruta /seguimiento/:id gracias a withComponentInputBinding(). */
   readonly id = input<string>();
 
@@ -118,5 +118,3 @@ class Seguimiento {
     }
   }
 }
-
-export default Seguimiento;

@@ -42,3 +42,8 @@ __screenshots__/
 # System files
 .DS_Store
 Thumbs.db
+
+# Playwright (PC5)
+/playwright-report/
+/e2e-resultados/
+/test-results/
