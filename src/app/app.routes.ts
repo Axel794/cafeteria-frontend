@@ -5,6 +5,7 @@ import { AdminProductos } from './pages/admin-productos/admin-productos';
 import { Aviso } from './pages/aviso/aviso';
 import { Carrito } from './pages/carrito/carrito';
 import { Carta } from './pages/carta/carta';
+import { Historial } from './pages/historial/historial';
 import { Login } from './pages/login/login';
 import { NuevoPedido } from './pages/nuevo-pedido/nuevo-pedido';
 import { Panel } from './pages/panel/panel';
@@ -13,7 +14,7 @@ import { Seguimiento } from './pages/seguimiento/seguimiento';
 /**
  * Mapa de navegacion de la aplicacion.
  *  Publicas : carta, carrito, pedido, seguimiento, login
- *  Personal : panel de comandas (barista o administrador)
+ *  Personal : panel de comandas e historial paginado (barista o administrador)
  *  Admin    : administracion de categorias y productos (solo administrador)
  */
 export const routes: Routes = [
@@ -31,6 +32,12 @@ export const routes: Routes = [
     component: Panel,
     canActivate: [rolGuard('BARISTA', 'ADMINISTRADOR')],
     title: 'Panel de comandas',
+  },
+  {
+    path: 'historial',
+    component: Historial,
+    canActivate: [rolGuard('BARISTA', 'ADMINISTRADOR')],
+    title: 'Historial de pedidos',
   },
   {
     path: 'admin/categorias',

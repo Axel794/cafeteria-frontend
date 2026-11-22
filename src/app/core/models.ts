@@ -97,6 +97,39 @@ export interface Pedido {
   detalles: DetallePedido[];
 }
 
+/** Fila del historial (GET /pedidos/historial): resumen sin el detalle de productos. */
+export interface PedidoResumen {
+  id: number;
+  codigoTicket: string;
+  fechaHora: string;
+  estado: EstadoPedido;
+  tipoPedido: TipoPedido;
+  numeroMesa: number | null;
+  nombreCliente: string | null;
+  total: number;
+  cantidadLineas: number;
+}
+
+/** Pagina de resultados (PaginaResponse del backend); `pagina` empieza en 0. */
+export interface Pagina<T> {
+  contenido: T[];
+  pagina: number;
+  tamanio: number;
+  totalElementos: number;
+  totalPaginas: number;
+  primera: boolean;
+  ultima: boolean;
+}
+
+export interface FiltroHistorial {
+  estado?: EstadoPedido | null;
+  desde?: string | null;
+  hasta?: string | null;
+  q?: string | null;
+  pagina: number;
+  tamanio: number;
+}
+
 export interface Tracker {
   id: number;
   codigoTicket: string;

@@ -329,3 +329,51 @@ test.describe('Fallas de comunicacion', () => {
     await captura(page, 'IT-16-pedido-inexistente');
   });
 });
+
+test.describe('PC6: historial paginado y busqueda de seguimiento', () => {
+  test('IT-17 El historial muestra una pagina del tamanio pedido y navega con el paginador', async ({ page }) => {
+    const [a] = await productosUnicosDisponibles(request, 1);
+    // Garantiza que haya mas de 5 pedidos para tener al menos 2 paginas.
+    for (let i = 0; i < 6; i++) {
+      await request.post(`${API}/pedidos`, {
+        data: { tipoPedido: 'LOCAL', numeroMesa: 2, detalles: [{ productoId: a.id, cantidad: 1 }] },
+      });
+    }
+    await entrar(page, BARISTA);
+    await page.goto('/historial');
+    await page.selectOption('#h-tamanio', '5');
+    await expect(page.locator('tbody tr')).toHaveCount(5);
+
+    const pagina0 = await (await request.get(`${API}/pedidos/historial?page=0&size=5`, { headers: auth(tokenBarista) })).json();
+    const pagina1 = await (await request.get(`${API}/pedidos/historial?page=1&size=5`, { headers: auth(tokenBarista) })).json();
+    expect(pagina0.totalPaginas).toBeGreaterThanOrEqual(2);
+    // lo mas reciente primero: la primera fila de la pantalla es la primera de la API
+    await expect(page.locator('tbody tr').first()).toContainText(pagina0.contenido[0].codigoTicket);
+    await page.waitForTimeout(400);
+    await captura(page, 'IT-17a-historial-pagina-1');
+
+    await page.getByRole('button', { name: 'Siguiente' }).click();
+    await expect(page.locator('tbody tr').first()).toContainText(pagina1.contenido[0].codigoTicket);
+    await expect(page.locator('li.page-item.active')).toHaveText('2');
+    await page.waitForTimeout(400); // deja terminar la transicion CSS del paginador
+    await captura(page, 'IT-17b-historial-pagina-2');
+  });
+
+  test('IT-17c El historial exige sesion de personal', async ({ page }) => {
+    await page.goto('/historial');
+    await expect(page).toHaveURL(/login|sin-permiso/);
+  });
+
+  test('IT-18 Buscar un ticket escrito en el formulario de seguimiento muestra su estado', async ({ page }) => {
+    const [a] = await productosUnicosDisponibles(request, 1);
+    const creado = await (await request.post(`${API}/pedidos`, {
+      data: { tipoPedido: 'LOCAL', numeroMesa: 6, detalles: [{ productoId: a.id, cantidad: 1 }] },
+    })).json();
+    await page.goto('/seguimiento');
+    await page.fill('#ticket', creado.codigoTicket);
+    await page.getByRole('button', { name: 'Consultar' }).click();
+    await expect(page).toHaveURL(new RegExp(`/seguimiento/${creado.id}$`));
+    await expect(page.getByText(creado.codigoTicket).first()).toBeVisible();
+    await captura(page, 'IT-18-seguimiento-busqueda');
+  });
+});

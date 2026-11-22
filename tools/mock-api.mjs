@@ -22,6 +22,17 @@ const leer = (req) => new Promise((ok) => { let d = ''; req.on('data', (c) => (d
 const MENSAJES = { PENDIENTE: 'Recibimos tu pedido y esta en cola.', EN_PREPARACION: 'Estamos preparando tu pedido.', ENTREGADO: 'Pedido entregado. Buen provecho.' };
 const msg = (p) => p.estado === 'LISTO' ? (p.tipoPedido === 'PICKUP' ? 'Tu pedido esta listo. Recogelo en barra.' : 'Tu pedido esta listo y va en camino a tu mesa.') : MENSAJES[p.estado];
 
+// Con SEED=n se precargan n pedidos para ver la paginacion sin crearlos a mano.
+if (process.env.SEED) {
+  const nombres = ['Ana Torres', 'Luis Perez', 'Marta Ruiz', 'Carlos Diaz'];
+  for (let i = 1; i <= +process.env.SEED; i++) {
+    const p = prods[i % 4]; const pick = i % 3 === 0;
+    pedidos.push({ id: i, codigoTicket: 'CDD-' + String(i).padStart(6, '0'), fechaHora: new Date(Date.now() - (+process.env.SEED - i) * 3600_000).toISOString(),
+      estado: ORDEN[i % 4], tipoPedido: pick ? 'PICKUP' : 'LOCAL', numeroMesa: pick ? null : (i % 8) + 1, nombreCliente: pick ? nombres[i % 4] : null, telefonoCliente: pick ? '999000111' : null,
+      total: p.precio * 2, detalles: [{ productoId: p.id, producto: p.nombre, cantidad: 2, precioUnitario: p.precio, subtotal: p.precio * 2, notas: null }] });
+  }
+}
+
 createServer(async (req, res) => {
   if (req.method === 'OPTIONS') return send(res, 204);
   const url = new URL(req.url, 'http://x'); const ruta = url.pathname.replace('/api/v1', ''); const m = req.method; const rol = rolDe(req);
@@ -60,6 +71,19 @@ createServer(async (req, res) => {
   if ((r = ruta.match(/^\/pedidos\/(\d+)\/tracker$/)) && m === 'GET') { const p = pedidos.find((x) => x.id === +r[1]); if (!p) return err(res, 404, 'Pedido no encontrado con id: ' + r[1]); return send(res, 200, { id: p.id, codigoTicket: p.codigoTicket, estado: p.estado, tipoPedido: p.tipoPedido, fechaHora: p.fechaHora, mensaje: msg(p) }); }
   if (ruta.startsWith('/pedidos')) {
     if (!rol) return err(res, 401, 'Se requiere autenticacion');
+    if (ruta === '/pedidos/historial' && m === 'GET') {
+      const q = url.searchParams; const page = +(q.get('page') ?? 0); const size = +(q.get('size') ?? 10);
+      if (!(page >= 0)) return err(res, 400, 'La pagina debe ser 0 o mayor');
+      if (!(size >= 1 && size <= 50)) return err(res, 400, 'El tamanio de pagina debe estar entre 1 y 50');
+      const txt = (q.get('q') ?? '').trim().toLowerCase();
+      let l = [...pedidos].filter((p) => (!q.get('estado') || p.estado === q.get('estado'))
+        && (!txt || (p.nombreCliente ?? '').toLowerCase().includes(txt) || p.codigoTicket.toLowerCase().includes(txt))
+        && (!q.get('desde') || p.fechaHora.slice(0, 10) >= q.get('desde')) && (!q.get('hasta') || p.fechaHora.slice(0, 10) <= q.get('hasta')));
+      l.sort((a, b) => b.fechaHora.localeCompare(a.fechaHora) || b.id - a.id);
+      const contenido = l.slice(page * size, page * size + size).map((p) => ({ id: p.id, codigoTicket: p.codigoTicket, fechaHora: p.fechaHora, estado: p.estado, tipoPedido: p.tipoPedido, numeroMesa: p.numeroMesa, nombreCliente: p.nombreCliente, total: p.total, cantidadLineas: p.detalles.length }));
+      const totalPaginas = Math.ceil(l.length / size);
+      return send(res, 200, { contenido, pagina: page, tamanio: size, totalElementos: l.length, totalPaginas, primera: page === 0, ultima: page >= totalPaginas - 1 });
+    }
     if ((r = ruta.match(/^\/pedidos\/(\d+)$/)) && m === 'GET') { const p = pedidos.find((x) => x.id === +r[1]); return p ? send(res, 200, p) : err(res, 404, 'Pedido no encontrado con id: ' + r[1]); }
     if (ruta === '/pedidos' && m === 'GET') { const e = url.searchParams.get('estado'); return send(res, 200, e ? pedidos.filter((p) => p.estado === e) : pedidos); }
     if ((r = ruta.match(/^\/pedidos\/(\d+)\/estado$/)) && m === 'PUT') { const p = pedidos.find((x) => x.id === +r[1]); if (!p) return err(res, 404, 'Pedido no encontrado'); if (ORDEN.indexOf(body.estado) !== ORDEN.indexOf(p.estado) + 1) return err(res, 422, 'Transicion de estado invalida: de ' + p.estado + ' a ' + body.estado); p.estado = body.estado; return send(res, 200, p); }

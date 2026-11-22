@@ -1,6 +1,5 @@
 <h1 class="h3 mb-3">Seguimiento de tu pedido</h1>
-
-<form class="row g-2 align-items-start mb-4" (ngSubmit)="buscar()" novalidate>
+<form class="row g-2 align-items-start mb-4" (submit)="$event.preventDefault(); buscar()" novalidate>
   <div class="col-sm-8 col-md-6">
     <label class="visually-hidden" for="ticket">Número de ticket</label>
     <input

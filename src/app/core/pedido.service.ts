@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { EstadoPedido, Pedido, PedidoRequest, Tracker } from './models';
+import { EstadoPedido, FiltroHistorial, Pagina, Pedido, PedidoRequest, PedidoResumen, Tracker } from './models';
 
 /**
  * Acceso a /api/v1/pedidos.
@@ -28,6 +28,24 @@ export class PedidoService {
       params = params.set('estado', estado);
     }
     return this.http.get<Pedido[]>(this.url, { params });
+  }
+
+  /** Historial paginado (PC6). Los filtros vacios no se envian. */
+  historial(filtro: FiltroHistorial): Observable<Pagina<PedidoResumen>> {
+    let params = new HttpParams().set('page', filtro.pagina).set('size', filtro.tamanio);
+    if (filtro.estado) {
+      params = params.set('estado', filtro.estado);
+    }
+    if (filtro.desde) {
+      params = params.set('desde', filtro.desde);
+    }
+    if (filtro.hasta) {
+      params = params.set('hasta', filtro.hasta);
+    }
+    if (filtro.q?.trim()) {
+      params = params.set('q', filtro.q.trim());
+    }
+    return this.http.get<Pagina<PedidoResumen>>(`${this.url}/historial`, { params });
   }
 
   cambiarEstado(id: number, estado: EstadoPedido): Observable<Pedido> {

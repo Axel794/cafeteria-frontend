@@ -166,3 +166,12 @@ main {
 .comanda.estado-ENTREGADO {
   border-left-color: #adb5bd;
 }
+
+/* Paginador del historial con los colores de la marca */
+.pagination {
+  --bs-pagination-color: var(--cafe);
+  --bs-pagination-hover-color: var(--cafe-oscuro);
+  --bs-pagination-active-bg: var(--cafe);
+  --bs-pagination-active-border-color: var(--cafe);
+  --bs-pagination-focus-color: var(--cafe-oscuro);
+}
