@@ -72,3 +72,8 @@ npm run e2e:informe
 - El nombre de categoría permitía 100 caracteres pero el backend acepta 80: ahora el formulario valida 80.
 - El campo de seguimiento mostraba el id (`7`) en vez del ticket (`CDD-000007`).
 - El pie de página subía a la mitad de la pantalla en vistas cortas.
+
+
+## Despliegue (PC7)
+
+`npm run build` genera la versión de producción con `src/environments/environment.prod.ts` (`apiUrl: '/api/v1'`). El `Dockerfile` la sirve con nginx (`nginx.conf` reenvía `/api/` al backend). El stack completo se levanta desde el repositorio del backend (`deploy/docker-compose.full.yml`, ver `docs/DESPLIEGUE.md`).
